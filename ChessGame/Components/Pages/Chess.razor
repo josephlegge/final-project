@@ -1,0 +1,228 @@
+﻿@page "/chess"
+
+@using Services;
+@using Models;
+
+@inject Services.PieceService pieceService;
+@inject Services.BoardService boardService;
+
+<PageTitle>Counter</PageTitle>
+
+<br />
+
+
+@if (boardService.gameBegan == false)
+{
+	<button class="btn" @onclick='() => boardService.SpinBoard()'>Rotate Board: @boardService.spinBoard</button>
+
+	<br />
+
+	<button class="btn" @onclick='() => boardService.Start()'>Start?</button>
+	<button class="btn" @onclick='() => boardService.LoadGame()'>Load?</button>
+
+	// The if statement if only for the line break.
+	@if (boardService.winMessage != string.Empty)
+	{
+		// The if statement if only for the line break.
+		<br />
+		<br />
+		@boardService.winMessage
+		<br />
+		<br />
+	}
+
+	@for (int y = 0; y < 8; y++)
+	{
+		// Every time it moves down a column, then switch the color.
+		boardService.SwitchBoardColor();
+		// Every time it moves down a row, fill the row with pieces and switch the color.
+		@for (int x = 0; x < 8; x++)
+		{
+			// Black Side
+			if (y < 2)
+			{
+				if (y == 0)
+				{
+					if (x == 0 || x == 7)
+					{
+						Piece newPiece = pieceService.GeneratePiece("Rook", "Black", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+
+					}
+					else if (x == 1 || x == 6)
+					{
+						Piece newPiece = pieceService.GeneratePiece("Knight", "Black", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+					}
+					else if (x == 2 || x == 5)
+					{
+						Piece newPiece = pieceService.GeneratePiece("Bishop", "Black", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+					}
+					else if (x == 3)
+					{
+						Piece newPiece = pieceService.GeneratePiece("Queen", "Black", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+					}
+					else if (x == 4)
+					{
+						Piece newPiece = pieceService.GeneratePiece("King", "Black", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+					}
+					else
+					{
+						<img width="70" src=@boardService.image>
+					}
+				}
+				if (y == 1)
+				{
+					Piece newPiece = pieceService.GeneratePiece("Pawn", "Black", boardService.currentColor);
+					boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+				}
+
+
+			}
+			// White Side
+			else if (y > 5)
+			{
+				if (y == 7)
+				{
+					if (x == 0 || x == 7)
+					{
+						Piece newPiece = pieceService.GeneratePiece("Rook", "White", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+
+					}
+					else if (x == 1 || x == 6)
+					{
+						Piece newPiece = pieceService.GeneratePiece("Knight", "White", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+					}
+					else if (x == 2 || x == 5)
+					{
+						Piece newPiece = pieceService.GeneratePiece("Bishop", "White", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+					}
+					else if (x == 4)
+					{
+						Piece newPiece = pieceService.GeneratePiece("King", "White", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+					}
+					else if (x == 3)
+					{
+						Piece newPiece = pieceService.GeneratePiece("Queen", "White", boardService.currentColor);
+						boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+
+					}
+				}
+				if (y == 6)
+				{
+					Piece newPiece = pieceService.GeneratePiece("Pawn", "White", boardService.currentColor);
+					boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+				}
+			}
+			else
+			{
+				Piece newPiece = pieceService.GeneratePiece("Blank", "", boardService.currentColor);
+				boardService.chessBoard.ReturnTiles()[x, y] = newPiece;
+			}
+			boardService.SwitchBoardColor();
+
+		}
+	}
+}
+
+else if (boardService.gameBegan == true)
+{
+	<p>@boardService.playerTurn player's turn. @boardService.currentSelectedPiece</p>
+
+	if (boardService.spinBoard == true)
+	{
+		if (boardService.playerTurn == "White")
+		{
+			for (int y = 0; y < 8; y++)
+			{
+				for (int x = 0; x < 8; x++)
+				{
+					// Temporary ints for the piece's location.
+					int tempX = x;
+					int tempY = y;
+					<img width="70" src=@boardService.chessBoard.ReturnTiles()[x,y].ReturnProperties()["Image"] @onclick='() => boardService.Move(boardService, tempX, tempY)'>
+				}
+				<br />
+			}
+
+		}
+		// If it's the black player's turn, then display black on the bottom.
+		else
+			for (int y = 7; y > -1; y--)
+			{
+				for (int x = 7; x > -1; x--)
+				{
+					// Temporary ints for the piece's location.
+					int tempX = x;
+					int tempY = y;
+					<img width="70" src=@boardService.chessBoard.ReturnTiles()[x,y].ReturnProperties()["Image"] @onclick='() => boardService.Move(boardService, tempX, tempY)'>
+				}
+				<br />
+			}
+	}
+	// If it's the white player's turn, then display white on the bottom.
+	else
+	{
+		for (int y = 0; y < 8; y++)
+		{
+			for (int x = 0; x < 8; x++)
+			{
+				// Temporary ints for the piece's location.
+				int tempX = x;
+				int tempY = y;
+				<img width="70" src=@boardService.chessBoard.ReturnTiles()[x,y].ReturnProperties()["Image"] @onclick='() => boardService.Move(boardService, tempX, tempY)'>
+			}
+			<br />
+		}
+	}
+
+	<br />
+	<br />
+
+	@boardService.checkMessage
+
+	<br />
+	<br />
+
+	<!--Buttons to save, load, or quit.-->
+	<button class="btn" @onclick='() => boardService.SaveGame()'>Save?</button>
+	<button class="btn" @onclick='() => boardService.LoadGame()'>Load?</button>
+	<button class="btn" @onclick='() => boardService.QuitGame()'>Quit?</button>
+
+	<br />
+	<br />
+
+	<!--Display taken pieces below the board.-->
+	@for (int i = 0; i < boardService.takenPieces.Count(); i++)
+	{
+		<img width="70" src="@boardService.takenPieces[i].ReturnProperties()["Image"]">
+		// Move down a line if it's stacked to the end.
+		if (i == 7 || i == 15 || i == 23)
+		{
+			<br />
+		}
+	}
+
+}
+
+@code {
+
+	
+
+}
